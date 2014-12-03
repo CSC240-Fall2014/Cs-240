@@ -127,7 +127,7 @@ public class VoiceRecognitionActivity extends Activity {
 				else if(Rec.contains("artist"))
 				{
 					special = 1;
-					speak(this.getCurrentFocus());
+					speak(this.getWindow().getDecorView().getRootView());
 				}
 				else if(Rec.contains("play"))
 				{
