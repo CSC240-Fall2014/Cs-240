@@ -10,6 +10,8 @@ import android.app.SearchManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.view.View;
@@ -27,7 +29,7 @@ public class VoiceRecognitionActivity extends Activity {
 	private static final int VOICE_RECOGNITION_REQUEST_CODE = 1001;
 
 	private EditText metTextHint;
-	private TextView Choice, Stats, Shuff;
+	private TextView Choice, Stats, Shuff, In1, In2;
 	private Spinner msTextMatches;
 	private Button mbtSpeak;
 	private String[] cList;
@@ -35,6 +37,8 @@ public class VoiceRecognitionActivity extends Activity {
 	private int song;
 	private ArrayList<Integer> ID = new ArrayList<Integer>();
 	private int special;
+	private MediaPlayer vMP;
+	
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -44,6 +48,8 @@ public class VoiceRecognitionActivity extends Activity {
 		Choice = (TextView)findViewById(R.id.choice);
 		Stats = (TextView)findViewById(R.id.stat);
 		Shuff = (TextView)findViewById(R.id.Shuff);
+		In1 = (TextView)findViewById(R.id.in1);
+		In2 = (TextView)findViewById(R.id.in2);
 		//msTextMatches = (Spinner) findViewById(R.id.sNoOfMatches);
 		mbtSpeak = (Button) findViewById(R.id.btSpeak);
 		
@@ -55,6 +61,22 @@ public class VoiceRecognitionActivity extends Activity {
 		
 		song = 0;
 		special = 0;
+		vMP = new MediaPlayer();
+		vMP.setOnCompletionListener(new OnCompletionListener()
+		{
+
+			@Override
+			public void onCompletion(MediaPlayer vMP) 
+			{
+				
+				
+			}
+			
+		});
+	}
+	public void onFin(MediaPlayer mp)
+	{
+		
 	}
 
 	public void checkVoiceRecognition() {
@@ -69,7 +91,12 @@ public class VoiceRecognitionActivity extends Activity {
 		}
 	}
 
-	public void speak(View view) {
+	public void speak(View view) 
+	{
+		vRecognition();
+	}
+	public void vRecognition()
+	{
 		String[] Prompts = {"Please Say A Command", "Please Name An Artist"};
 		Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
 		// Specify the calling package to identify your application
@@ -80,8 +107,8 @@ public class VoiceRecognitionActivity extends Activity {
 		intent.putExtra(RecognizerIntent.EXTRA_PROMPT, Prompts[special]);
 
 		// Given an hint to the recognizer about what the user is going to say
-		intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-				RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH);
+		//intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+			//	RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH);
 
 		// If number of Matches is not selected then return show toast message
 		//if (msTextMatches.getSelectedItemPosition() == AdapterView.INVALID_POSITION) {
@@ -98,6 +125,7 @@ public class VoiceRecognitionActivity extends Activity {
 		intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1);
 
 		startActivityForResult(intent, VOICE_RECOGNITION_REQUEST_CODE);
+		
 	}
 
 	@Override
@@ -106,84 +134,103 @@ public class VoiceRecognitionActivity extends Activity {
 		
 		if (requestCode == VOICE_RECOGNITION_REQUEST_CODE)
 		{
-
-			//If Voice recognition is successful then it returns RESULT_OK
-			if(resultCode == RESULT_OK && special == 0) 
+			if(resultCode == RESULT_OK)
 			{
-
-				ArrayList<String> textMatchList = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-				
-				String Rec = textMatchList.get(0);
-				Rec.toLowerCase();
-				
-				if(Rec.contains("quit")|| Rec.contains("exit"))
+				String Rec;
+				if(In1.getText().equals(""))
 				{
-					System.exit(0);
-				}
-				else if(Rec.contains("test"))
-				{
-					Choice.setText("Test");
-				}
-				else if(Rec.contains("artist"))
-				{
-					special = 1;
-					speak(this.getWindow().getDecorView().getRootView());
-				}
-				else if(Rec.contains("play"))
-				{
-					Stats.setText("Play");
-					Choice.setText(ID.get(song).toString());
-				}
-				else if(Rec.contains("pause"))
-				{
-					Stats.setText("Pause");
-				}
-				else if(Rec.contains("stop"))
-				{
-					Stats.setText("Stop");
-					Choice.setText("");
-				}
-				else if(Rec.contains("next"))
-				{
-					song = (song + 1) % ID.size();
-					Choice.setText(ID.get(song).toString());
-				}
-				else if((Rec.contains("last") || Rec.contains("previous")))
-				{
-					if(song != 0)
-					{
-						song --;
-						
-						Choice.setText(ID.get(song).toString());
-					}
+					ArrayList<String> textMatchList = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
 					
-				}
-				
-				else if(Rec.contains("shuffle") || Rec.contains("random"))
-				{
-					Collections.shuffle(ID);
-					song = 0;
-					Choice.setText(ID.get(song).toString());
-					Stats.setText("Play");
-					Shuff.setText("On");
+					Rec = textMatchList.get(0);
 					
 				}
 				else
 				{
-					Choice.setText("ERROR");
+					Rec = In1.getText().toString();
+				}
+				Rec.toLowerCase();
+				
+				if(special == 1)
+				{
+					if(In2.getText() != "")
+					{
+						Rec = In2.getText().toString();
+					}
+					
+					Choice.setText(Rec);
+					special = 0;
+					//Insert a Query to get all the entries of a specific artist and then add their ID to an arraylist for Now Playing
 				}
 
+				//If Voice recognition is successful then it returns RESULT_OK
+				else if(special == 0) 
+				{
+
+					
+					
+					if(Rec.contains("quit")|| Rec.contains("exit"))
+					{
+						System.exit(0);
+					}
+					else if(Rec.contains("test"))
+					{
+						Choice.setText("Test");
+					}
+					else if(Rec.contains("artist"))
+					{
+						special = 1;
+						vRecognition();
+						
+					}
+					else if(Rec.contains("play"))
+					{
+						Stats.setText("Play");
+						Choice.setText(ID.get(song).toString());
+					}
+					else if(Rec.contains("pause"))
+					{
+						Stats.setText("Pause");
+					}
+					else if(Rec.contains("stop"))
+					{
+						Stats.setText("Stop");
+						Choice.setText("");
+					}
+					else if(Rec.contains("next"))
+					{
+						song = (song + 1) % ID.size();
+						Choice.setText(ID.get(song).toString());
+					}
+					else if((Rec.contains("last") || Rec.contains("previous")))
+					{
+						if(song != 0)
+						{
+							song --;
+							
+							Choice.setText(ID.get(song).toString());
+						}
+						
+					}
+					
+					else if(Rec.contains("shuffle") || Rec.contains("random"))
+					{
+						Collections.shuffle(ID);
+						song = 0;
+						Choice.setText(ID.get(song).toString());
+						Stats.setText("Play");
+						Shuff.setText("On");
+						
+					}
+					else
+					{
+						Choice.setText("ERROR");
+					}
+
+				}
 			}
-			if(resultCode == RESULT_OK && special == 1)
-			{
-				ArrayList<String> textMatchList = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-				
-				String Rec = textMatchList.get(0);
-				Rec.toLowerCase();
-				Choice.setText(Rec);
-				special = 0;
-				//Insert a Query to get all the entries of a specific artist and then add their ID to an arraylist for Now Playing
-			}
+			
+			
+			
 			//Result code for various error.	
 			else if(resultCode == RecognizerIntent.RESULT_AUDIO_ERROR){
 				showToastMessage("Audio Error");

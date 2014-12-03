@@ -4,8 +4,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    
-    
     <Button
         android:id="@+id/btSpeak"
         android:layout_width="match_parent"
@@ -18,7 +16,6 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        
         android:text="Now Playing"
         android:textStyle="bold" />
 
@@ -54,5 +51,23 @@
         android:layout_gravity="center_horizontal"
         android:text="Off"
         android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <EditText
+        android:id="@+id/in1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:ems="10"
+        android:text="" >
+
+        <requestFocus />
+    </EditText>
+
+    <EditText
+        android:id="@+id/in2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:text="" />
 
 </LinearLayout>
