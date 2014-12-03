@@ -147,7 +147,7 @@ public class VoiceRecognitionActivity extends Activity {
 				{
 					if(song != 0)
 					{
-						song = (song - 1) % ID.size();
+						song --;
 						
 						Choice.setText(ID.get(song).toString());
 					}
