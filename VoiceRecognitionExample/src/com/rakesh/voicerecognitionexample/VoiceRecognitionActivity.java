@@ -27,11 +27,11 @@ public class VoiceRecognitionActivity extends Activity {
 	private static final int VOICE_RECOGNITION_REQUEST_CODE = 1001;
 
 	private EditText metTextHint;
-	private TextView Choice, Stats;
+	private TextView Choice, Stats, Shuff;
 	private Spinner msTextMatches;
 	private Button mbtSpeak;
 	private String[] cList;
-	private String[] sList = new String[50];
+	
 	private int song;
 	private ArrayList<Integer> ID = new ArrayList<Integer>();
 	private int special;
@@ -40,20 +40,18 @@ public class VoiceRecognitionActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_voice_recognition);
-		metTextHint = (EditText) findViewById(R.id.etTextHint);
+		
 		Choice = (TextView)findViewById(R.id.choice);
 		Stats = (TextView)findViewById(R.id.stat);
+		Shuff = (TextView)findViewById(R.id.Shuff);
 		//msTextMatches = (Spinner) findViewById(R.id.sNoOfMatches);
 		mbtSpeak = (Button) findViewById(R.id.btSpeak);
-		for(int x = 0; x < 50; x++)
-		{
-			sList[x] = x + "";
-		}
+		
 		for(int x = 0; x < 50; x++)
 		{
 			ID.add(x);
 		}
-		Collections.shuffle(ID);
+		
 		
 		song = 0;
 		special = 0;
@@ -72,14 +70,14 @@ public class VoiceRecognitionActivity extends Activity {
 	}
 
 	public void speak(View view) {
+		String[] Prompts = {"Please Say A Command", "Please Name An Artist"};
 		Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
 		// Specify the calling package to identify your application
 		intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, getClass()
 				.getPackage().getName());
 
 		// Display an hint to the user about what he should say.
-		intent.putExtra(RecognizerIntent.EXTRA_PROMPT, metTextHint.getText()
-				.toString());
+		intent.putExtra(RecognizerIntent.EXTRA_PROMPT, Prompts[special]);
 
 		// Given an hint to the recognizer about what the user is going to say
 		intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
@@ -129,7 +127,7 @@ public class VoiceRecognitionActivity extends Activity {
 				else if(Rec.contains("play"))
 				{
 					Stats.setText("Play");
-					Choice.setText(sList[song]);
+					Choice.setText(ID.get(song).toString());
 				}
 				else if(Rec.contains("pause"))
 				{
@@ -142,19 +140,32 @@ public class VoiceRecognitionActivity extends Activity {
 				}
 				else if(Rec.contains("next"))
 				{
-					song = (song + 1) % sList.length;
-					Choice.setText(sList[song]);
+					song = (song + 1) % ID.size();
+					Choice.setText(ID.get(song).toString());
 				}
-				else if((Rec.contains("last") || Rec.contains("previous")) && song > 0)
+				else if((Rec.contains("last") || Rec.contains("previous")))
 				{
-					song = (song - 1) % sList.length;
+					if(song != 0)
+					{
+						song = (song - 1) % ID.size();
+						
+						Choice.setText(ID.get(song).toString());
+					}
 					
-					Choice.setText(sList[song]);
 				}
 				else if(Rec.contains("artist"))
 				{
 					special = 1;
 					speak(this.getCurrentFocus());
+				}
+				else if(Rec.contains("shuffle") || Rec.contains("random"))
+				{
+					Collections.shuffle(ID);
+					song = 0;
+					Choice.setText(ID.get(song).toString());
+					Stats.setText("Play");
+					Shuff.setText("On");
+					
 				}
 				else
 				{
@@ -168,6 +179,7 @@ public class VoiceRecognitionActivity extends Activity {
 				
 				String Rec = textMatchList.get(0);
 				Rec.toLowerCase();
+				Choice.setText(Rec);
 				//Insert a Query to get all the entries of a specific artist and then add their ID to an arraylist for Now Playing
 			}
 			//Result code for various error.	
