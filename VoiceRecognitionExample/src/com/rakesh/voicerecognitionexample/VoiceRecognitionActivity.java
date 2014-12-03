@@ -124,6 +124,11 @@ public class VoiceRecognitionActivity extends Activity {
 				{
 					Choice.setText("Test");
 				}
+				else if(Rec.contains("artist"))
+				{
+					special = 1;
+					speak(this.getCurrentFocus());
+				}
 				else if(Rec.contains("play"))
 				{
 					Stats.setText("Play");
@@ -153,11 +158,7 @@ public class VoiceRecognitionActivity extends Activity {
 					}
 					
 				}
-				else if(Rec.contains("artist"))
-				{
-					special = 1;
-					speak(this.getCurrentFocus());
-				}
+				
 				else if(Rec.contains("shuffle") || Rec.contains("random"))
 				{
 					Collections.shuffle(ID);
@@ -180,6 +181,7 @@ public class VoiceRecognitionActivity extends Activity {
 				String Rec = textMatchList.get(0);
 				Rec.toLowerCase();
 				Choice.setText(Rec);
+				special = 0;
 				//Insert a Query to get all the entries of a specific artist and then add their ID to an arraylist for Now Playing
 			}
 			//Result code for various error.	
