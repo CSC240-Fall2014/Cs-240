@@ -1,5 +1,6 @@
 package com.rakesh.voicerecognitionexample;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -12,6 +13,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
+import android.net.Uri;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.view.View;
@@ -33,11 +35,13 @@ public class VoiceRecognitionActivity extends Activity {
 	private Spinner msTextMatches;
 	private Button mbtSpeak;
 	private String[] cList;
-	
+	private boolean shuf;
 	private int song;
 	private ArrayList<Integer> ID = new ArrayList<Integer>();
+	private ArrayList<Integer> Origin = new ArrayList<Integer>();
 	private int special;
-	private MediaPlayer vMP;
+	private MediaPlayer vMP = new MediaPlayer();;
+	private String rPath = "android.resource://com.rakesh.voicerecognitionexample/Songs/";
 	
 
 	@Override
@@ -52,31 +56,56 @@ public class VoiceRecognitionActivity extends Activity {
 		In2 = (TextView)findViewById(R.id.in2);
 		//msTextMatches = (Spinner) findViewById(R.id.sNoOfMatches);
 		mbtSpeak = (Button) findViewById(R.id.btSpeak);
+		ID.add(1);
+		ID.add(2);
+		ID.add(3);
 		
-		for(int x = 0; x < 50; x++)
-		{
-			ID.add(x);
-		}
+		Origin = ID;
 		
 		
 		song = 0;
 		special = 0;
-		vMP = new MediaPlayer();
+		
 		vMP.setOnCompletionListener(new OnCompletionListener()
 		{
 
 			@Override
 			public void onCompletion(MediaPlayer vMP) 
 			{
-				
+				onFin();
 				
 			}
 			
 		});
-	}
-	public void onFin(MediaPlayer mp)
-	{
 		
+		setSong();
+		shuf = false;
+	}
+	public void setSong()
+	{
+		Uri path = Uri.parse(rPath + ID.get(song) + ".mp3");
+		try {
+			vMP.setDataSource(this, path);
+		} catch (IllegalArgumentException | SecurityException
+				| IllegalStateException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			vMP.prepare();
+		} catch (IllegalStateException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	public void onFin()
+	{
+		song = (song + 1) % ID.size();
+		Choice.setText(ID.get(song));
+		setSong();
+		vMP.start();
+		//use the next indexed ID to retrieve next source
+		//Set source to new Song
 	}
 
 	public void checkVoiceRecognition() {
@@ -186,20 +215,24 @@ public class VoiceRecognitionActivity extends Activity {
 					{
 						Stats.setText("Play");
 						Choice.setText(ID.get(song).toString());
+						setSong();
+						vMP.start();
 					}
 					else if(Rec.contains("pause"))
 					{
 						Stats.setText("Pause");
+						vMP.pause();
 					}
 					else if(Rec.contains("stop"))
 					{
 						Stats.setText("Stop");
 						Choice.setText("");
+						vMP.stop();
 					}
 					else if(Rec.contains("next"))
 					{
-						song = (song + 1) % ID.size();
-						Choice.setText(ID.get(song).toString());
+						onFin();
+						
 					}
 					else if((Rec.contains("last") || Rec.contains("previous")))
 					{
@@ -208,17 +241,27 @@ public class VoiceRecognitionActivity extends Activity {
 							song --;
 							
 							Choice.setText(ID.get(song).toString());
+							setSong();
+							vMP.start();
 						}
 						
 					}
 					
 					else if(Rec.contains("shuffle") || Rec.contains("random"))
 					{
-						Collections.shuffle(ID);
-						song = 0;
-						Choice.setText(ID.get(song).toString());
-						Stats.setText("Play");
-						Shuff.setText("On");
+						if(shuf)
+						{
+							ID = Origin;
+						}
+						else
+						{
+							Collections.shuffle(ID);
+							song = 0;
+							Choice.setText(ID.get(song).toString());
+							Stats.setText("Play");
+							Shuff.setText("On");
+						}
+						shuf = !shuf;
 						
 					}
 					else
