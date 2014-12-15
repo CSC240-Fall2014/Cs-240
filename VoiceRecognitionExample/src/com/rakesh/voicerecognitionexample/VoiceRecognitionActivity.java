@@ -25,15 +25,17 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 
 public class VoiceRecognitionActivity extends Activity {
 	private static final int VOICE_RECOGNITION_REQUEST_CODE = 1001;
 
 	private EditText metTextHint;
-	private TextView Choice, Stats, Shuff, In1, In2;
+	private TextView Choice, Stats, In1, In2;
 	private Spinner msTextMatches;
-	private Button mbtSpeak;
+	private Button mbtSpeak, bPause;
+	private ToggleButton tShuff;
 	private String[] cList;
 	private boolean shuf;
 	private int song;
@@ -41,7 +43,8 @@ public class VoiceRecognitionActivity extends Activity {
 	private ArrayList<Integer> Origin = new ArrayList<Integer>();
 	private int special;
 	private MediaPlayer vMP = new MediaPlayer();;
-	private String rPath = "android.resource://com.rakesh.voicerecognitionexample/Songs/";
+	private String rPath = "/storage/extSdCard/Songs/";
+	private int vol;
 	
 
 	@Override
@@ -51,11 +54,13 @@ public class VoiceRecognitionActivity extends Activity {
 		
 		Choice = (TextView)findViewById(R.id.choice);
 		Stats = (TextView)findViewById(R.id.stat);
-		Shuff = (TextView)findViewById(R.id.Shuff);
+		
+		tShuff = (ToggleButton)findViewById(R.id.tShuff);
 		In1 = (TextView)findViewById(R.id.in1);
 		In2 = (TextView)findViewById(R.id.in2);
 		//msTextMatches = (Spinner) findViewById(R.id.sNoOfMatches);
 		mbtSpeak = (Button) findViewById(R.id.btSpeak);
+		bPause = (Button) findViewById(R.id.bPause);
 		ID.add(1);
 		ID.add(2);
 		ID.add(3);
@@ -65,6 +70,8 @@ public class VoiceRecognitionActivity extends Activity {
 		
 		song = 0;
 		special = 0;
+		vol = 4; 
+		bPause.setEnabled(false);
 		
 		vMP.setOnCompletionListener(new OnCompletionListener()
 		{
@@ -81,11 +88,16 @@ public class VoiceRecognitionActivity extends Activity {
 		setSong();
 		shuf = false;
 	}
+	@Override
+	public void onDestroy()
+	{
+		vMP.release();
+	}
 	public void setSong()
 	{
-		Uri path = Uri.parse(rPath + ID.get(song) + ".mp3");
+		vMP.reset();
 		try {
-			vMP.setDataSource(this, path);
+			vMP.setDataSource(rPath + ID.get(song) + ".mp3");
 		} catch (IllegalArgumentException | SecurityException
 				| IllegalStateException | IOException e) {
 			// TODO Auto-generated catch block
@@ -97,15 +109,76 @@ public class VoiceRecognitionActivity extends Activity {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		 
 	}
 	public void onFin()
 	{
 		song = (song + 1) % ID.size();
-		Choice.setText(ID.get(song));
+		Choice.setText(ID.get(song).toString());
+		
 		setSong();
 		vMP.start();
 		//use the next indexed ID to retrieve next source
 		//Set source to new Song
+	}
+	public void onPlay(View v)
+	{
+		Stats.setText("Play");
+		Choice.setText(ID.get(song).toString());
+		setSong();
+		vMP.start();
+		bPause.setEnabled(true);
+	}
+	public void onStop(View v)
+	{
+
+		Stats.setText("Stop");
+		Choice.setText("");
+		vMP.stop();
+		bPause.setEnabled(false);
+	}
+	public void onPause(View v)
+	{
+		Stats.setText("Pause");
+		vMP.pause();
+	}
+	public void onLast(View v)
+	{
+		if(song != 0)
+		{
+			song --;
+			
+			Choice.setText(ID.get(song).toString());
+			setSong();
+			vMP.start();
+		}
+	}
+	public void onNext(View v)
+	{
+		onFin();
+		
+	}
+	public void onShuff(View v)
+	{
+		if(shuf)
+		{
+			ID = Origin;
+			
+			song = 0;
+			Stats.setText("Play");
+			Choice.setText(ID.get(song).toString());
+		}
+		else
+		{
+			Collections.shuffle(ID);
+			song = 0;
+			Choice.setText(ID.get(song).toString());
+			Stats.setText("Play");
+			
+		}
+		shuf = !shuf;
+		setSong();
+		vMP.start();
 	}
 
 	public void checkVoiceRecognition() {
@@ -211,12 +284,33 @@ public class VoiceRecognitionActivity extends Activity {
 						vRecognition();
 						
 					}
+					else if(Rec.contains("up") || Rec.contains("increase"))
+					{
+						if (vol < 10)
+						{
+							vol += 2;
+							float log1=(float)(Math.log(10-vol)/Math.log(10));
+							vMP.setVolume(1-log1, 1-log1);
+						}
+						
+					}
+					else if(Rec.contains("down") || Rec.contains("decrease"))
+					{
+						if(vol >= 2)
+						{
+							vol -= 2;
+							vol += 2;
+							float log1=(float)(Math.log(10-vol)/Math.log(10));
+							vMP.setVolume(1-log1, 1-log1);
+						}
+					}
 					else if(Rec.contains("play"))
 					{
 						Stats.setText("Play");
 						Choice.setText(ID.get(song).toString());
 						setSong();
 						vMP.start();
+						bPause.setEnabled(true);
 					}
 					else if(Rec.contains("pause"))
 					{
@@ -228,6 +322,8 @@ public class VoiceRecognitionActivity extends Activity {
 						Stats.setText("Stop");
 						Choice.setText("");
 						vMP.stop();
+						bPause.setEnabled(false);
+						
 					}
 					else if(Rec.contains("next"))
 					{
@@ -252,6 +348,10 @@ public class VoiceRecognitionActivity extends Activity {
 						if(shuf)
 						{
 							ID = Origin;
+							song = 0;
+							Stats.setText("Play");
+							tShuff.setChecked(false);
+							Choice.setText(ID.get(song).toString());
 						}
 						else
 						{
@@ -259,9 +359,12 @@ public class VoiceRecognitionActivity extends Activity {
 							song = 0;
 							Choice.setText(ID.get(song).toString());
 							Stats.setText("Play");
-							Shuff.setText("On");
+							
+							tShuff.setChecked(true);
 						}
 						shuf = !shuf;
+						setSong();
+						vMP.start();
 						
 					}
 					else
