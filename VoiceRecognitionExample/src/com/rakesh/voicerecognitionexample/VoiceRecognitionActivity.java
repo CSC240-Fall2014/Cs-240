@@ -1,5 +1,6 @@
 package com.rakesh.voicerecognitionexample;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,33 +9,40 @@ import java.util.Arrays;
 
 import android.app.Activity;
 import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.speech.RecognizerIntent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
 
-public class VoiceRecognitionActivity extends Activity {
+public class VoiceRecognitionActivity extends Activity  {
 	private static final int VOICE_RECOGNITION_REQUEST_CODE = 1001;
 
 	private EditText metTextHint;
 	private TextView Choice, Stats, In1, In2;
 	private Spinner msTextMatches;
-	private Button mbtSpeak, bPause;
+	private Button bPause;
+	private ImageButton mbtSpeak;
 	private ToggleButton tShuff;
 	private String[] cList;
 	private boolean shuf;
@@ -45,13 +53,16 @@ public class VoiceRecognitionActivity extends Activity {
 	private MediaPlayer vMP = new MediaPlayer();;
 	private String rPath = "/storage/extSdCard/Songs/";
 	private int vol;
-	
+	private SeekBar Seek = new SeekBar(getApplicationContext());
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_voice_recognition);
-		
+		this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+		File directory = new File(Environment.getExternalStorageDirectory()  + File.separator + "Voice Songs");
+		boolean test = directory.mkdirs();
+		//Toast.makeText(getApplicationContext(), test + "" , Toast.LENGTH_LONG).show();
 		Choice = (TextView)findViewById(R.id.choice);
 		Stats = (TextView)findViewById(R.id.stat);
 		
@@ -59,8 +70,9 @@ public class VoiceRecognitionActivity extends Activity {
 		In1 = (TextView)findViewById(R.id.in1);
 		In2 = (TextView)findViewById(R.id.in2);
 		//msTextMatches = (Spinner) findViewById(R.id.sNoOfMatches);
-		mbtSpeak = (Button) findViewById(R.id.btSpeak);
+		mbtSpeak = (ImageButton) findViewById(R.id.btSpeak);
 		bPause = (Button) findViewById(R.id.bPause);
+		
 		ID.add(1);
 		ID.add(2);
 		ID.add(3);
