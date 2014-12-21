@@ -54,14 +54,14 @@ public class VoiceRecognitionActivity extends Activity  {
 	private MediaPlayer vMP = new MediaPlayer();;
 	private String rPath = "/storage/extSdCard/Songs/";
 	private int vol;
-	private SeekBar Seek;
-	private TextView textview;
+	
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
 		setContentView(R.layout.activity_voice_recognition);
-		this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+		
 		File directory = new File(Environment.getExternalStorageDirectory()  + File.separator + "Voice Songs");
 		boolean test = directory.mkdirs();
 		//Toast.makeText(getApplicationContext(), test + "" , Toast.LENGTH_LONG).show();
@@ -74,30 +74,7 @@ public class VoiceRecognitionActivity extends Activity  {
 		//msTextMatches = (Spinner) findViewById(R.id.sNoOfMatches);
 		mbtSpeak = (ImageButton) findViewById(R.id.btSpeak);
 		bPause = (Button) findViewById(R.id.bPause);
-		 initializeVariables();
-		 textview.setText("Covered: " + Seek.getProgress() + "/" + Seek.getMax());
-		  
-		  Seek.setOnSeekBarChangeListener(new OnSeekBarChangeListener() 
-		  {
-			  int progress = 0;
-			  
-			  @Override
-			  public void onProgressChanged(SeekBar Seek, int progresValue, boolean fromUser) {
-				  progress = progresValue;
-				  Toast.makeText(getApplicationContext(), "Changing seekbar's progress", Toast.LENGTH_SHORT).show();
-			  }
-			
-			  @Override
-			  public void onStartTrackingTouch(SeekBar Seek) {
-				  Toast.makeText(getApplicationContext(), "Started tracking seekbar", Toast.LENGTH_SHORT).show();
-			  }
-			
-			  @Override
-			  public void onStopTrackingTouch(SeekBar Seek) {
-				  textview.setText("Covered: " + progress + "/" + Seek.getMax());
-				  Toast.makeText(getApplicationContext(), "Stopped tracking seekbar", Toast.LENGTH_SHORT).show();
-			  }
-		   });
+		 
 		 
 		 
 		
@@ -134,11 +111,7 @@ public class VoiceRecognitionActivity extends Activity  {
 		vMP.release();
 	}
 	 // A private method to help us initialize our variables.
-	 private void initializeVariables() 
-	 {
-		 Seek = (SeekBar) findViewById(R.id.seekBar1);
-		 textview = (TextView) findViewById(R.id.textView1);
-	 }
+	
 	public void setSong()
 	{
 		vMP.reset();

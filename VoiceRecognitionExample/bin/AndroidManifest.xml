@@ -17,7 +17,8 @@
        
         <activity
             android:name=".VoiceRecognitionActivity"
-            android:label="@string/title_activity_voice_recognition" >
+            android:label="@string/title_activity_voice_recognition"
+            android:screenOrientation="landscape" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
