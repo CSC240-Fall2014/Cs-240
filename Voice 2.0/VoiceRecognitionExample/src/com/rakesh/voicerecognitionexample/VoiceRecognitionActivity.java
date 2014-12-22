@@ -71,8 +71,8 @@ public class VoiceRecognitionActivity extends Activity  {
 		super.onCreate(savedInstanceState);
 		
 		setContentView(R.layout.activity_voice_recognition);
-		File directory = new File(Environment.getExternalStorageDirectory()  + File.separator + "Voice Songs");
-		boolean test = directory.mkdirs();
+		//File directory = new File(Environment.getExternalStorageDirectory()  + File.separator + "Voice Songs");
+		//boolean test = directory.mkdirs();
 		//String rPath = Environment.getExternalStorageDirectory() + File.separator + "Voice Songs" + File.separator;
 		seek = (SeekBar)findViewById(R.id.seek);
 		database = new DaMuzikSource(this);
@@ -363,26 +363,7 @@ public class VoiceRecognitionActivity extends Activity  {
 						vRecognition();
 						
 					}
-					else if(Rec.contains("up") || Rec.contains("increase"))
-					{
-						if (vol < 10)
-						{
-							vol += 2;
-							float log1=(float)(Math.log(10-vol)/Math.log(10));
-							vMP.setVolume(1-log1, 1-log1);
-						}
-						
-					}
-					else if(Rec.contains("down") || Rec.contains("decrease"))
-					{
-						if(vol >= 2)
-						{
-							vol -= 2;
-							vol += 2;
-							float log1=(float)(Math.log(10-vol)/Math.log(10));
-							vMP.setVolume(1-log1, 1-log1);
-						}
-					}
+					
 					else if(Rec.contains("play"))
 					{
 						Stats.setText("Play");
