@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">DaMuzikDB</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="show">Show All</string>
+    <string name="artist">Show Artist</string>
+    <string name="theList">Music Info</string>
+
+</resources>
